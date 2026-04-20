@@ -158,7 +158,7 @@ export default function StudentKiosk() {
                 lookup(val)
               }
             }}
-            placeholder="Scan or Enter HT No."
+            placeholder="Scan or Enter Hall Ticket No."
             //className="flex-1 min-w-0 text-sm px-3 py-2 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
             className="flex-1 min-w-0 text-lg px-4 py-3 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
 
