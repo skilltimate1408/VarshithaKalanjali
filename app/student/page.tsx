@@ -126,11 +126,12 @@ export default function StudentKiosk() {
           <Image
             src="/logo.png"
             alt="Varshi Innovations"
-            width={48}
-            height={48}
-            className="rounded-full object-contain w-12 h-12"
+            width={64}
+            height={64}
+            className="rounded-full object-contain w-16 h-16"
           />
-          <h1 className="font-black text-sm leading-tight text-center mt-1">Exam Room Finder</h1>
+                    <h1 className="font-black text-lg leading-tight text-center mt-1">Exam Room Finder</h1>
+
         </div>
         {/* Input stretches to fill remaining space */}
                 <div className="flex gap-1 w-100 absolute left-1/2 -translate-x-1/2">
@@ -153,7 +154,9 @@ export default function StudentKiosk() {
               }
             }}
             placeholder="Scan or Enter Hall Ticket No."
-            className="flex-1 min-w-0 text-sm px-3 py-2 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
+            //className="flex-1 min-w-0 text-sm px-3 py-2 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
+            className="flex-1 min-w-0 text-lg px-4 py-3 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
+
             autoComplete="off"
             spellCheck={false}
           />
@@ -165,7 +168,9 @@ export default function StudentKiosk() {
               }
             }}
             disabled={loading}
-            className="bg-yellow-400 text-blue-900 px-3 py-2 rounded-lg font-black text-sm hover:bg-yellow-300 disabled:opacity-40 transition-colors shrink-0"
+            //className="bg-yellow-400 text-blue-900 px-3 py-2 rounded-lg font-black text-sm hover:bg-yellow-300 disabled:opacity-40 transition-colors shrink-0"
+                  className="bg-yellow-400 text-blue-900 px-5 py-3 rounded-lg font-black text-lg hover:bg-yellow-300 disabled:opacity-40 transition-colors shrink-0"
+
           >
             {loading ? '…' : 'GO'}
           </button>
@@ -204,34 +209,40 @@ export default function StudentKiosk() {
             </div>
 
             <div className="p-3">
-              <h2 className="text-xl font-black text-blue-900 text-center border-b pb-2 mb-3">
+              <h2 className="text-3xl font-black text-blue-900 text-center border-b pb-2 mb-3">
+
                 {s.student_name}
               </h2>
 
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-blue-50 rounded-xl p-2 text-center border-2 border-blue-200">
                   <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Room</p>
-                  <p className="text-3xl font-black text-blue-700 leading-none">{s.room_no}</p>
+                                    <p className="text-5xl font-black text-blue-700 leading-none">{s.room_no}</p>
+
                 </div>
                 <div className="bg-purple-50 rounded-xl p-2 text-center border-2 border-purple-200">
                   <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Building</p>
-                  <p className="text-base font-black text-purple-700 leading-none break-words">{s.building}</p>
+                                    <p className="text-2xl font-black text-purple-700 leading-none break-words">{s.building}</p>
+
                 </div>
                 <div className="bg-green-50 rounded-xl p-2 text-center border-2 border-green-200">
                   <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Seat</p>
-                  <p className="text-3xl font-black text-green-700 leading-none">{s.seat_no}</p>
+                                    <p className="text-5xl font-black text-green-700 leading-none">{s.seat_no}</p>
+
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-gray-50 rounded-xl p-2 text-center">
                   <p className="text-gray-400 text-[10px] uppercase">Branch</p>
-                  <p className="font-bold text-gray-700 text-sm">{s.branch}</p>
+                                   <p className="font-bold text-gray-700 text-xl">{s.branch}</p>
+
                 </div>
                 {s.exam_date && (
                   <div className="bg-yellow-50 rounded-xl p-2 text-center">
                     <p className="text-gray-400 text-[10px] uppercase">Date & Session</p>
-                    <p className="font-bold text-gray-700 text-xs">{s.exam_date} — {s.session}</p>
+                                        <p className="font-bold text-gray-700 text-lg">{s.exam_date} — {s.session}</p>
+
                   </div>
                 )}
               </div>
