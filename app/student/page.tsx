@@ -122,15 +122,17 @@ export default function StudentKiosk() {
             <div className="flex items-center gap-4 px-4 py-2 border-b border-blue-700/40 bg-blue-900/50 shrink-0 justify-between relative">
 
         {/* Logo + title stacked on left */}
-        <div className="flex flex-col items-center shrink-0 w-20">
+                <div className="flex items-center gap-2 shrink-0">
+
           <Image
             src="/logo.png"
             alt="Varshi Innovations"
-            width={64}
-            height={64}
-            className="rounded-full object-contain w-16 h-16"
+            width={80}
+            height={80}
+            className="rounded-full object-contain w-20 h-20"
           />
-                    <h1 className="font-black text-lg leading-tight text-center mt-1">Exam Room Finder</h1>
+                              <h1 className="font-black text-3xl leading-tight text-center mt-1">Exam Room Finder</h1>
+
 
         </div>
         {/* Input stretches to fill remaining space */}
@@ -194,9 +196,10 @@ export default function StudentKiosk() {
         {/* Idle state */}
         {!loading && !error && !hasResult && !inputValue && (
           <div className="text-center text-blue-300">
-            <div className="text-4xl mb-2">📷</div>
-            <p className="text-sm font-semibold">Ready to Scan</p>
-            <p className="text-xs mt-1 text-blue-400">Scan barcode or type hall ticket number</p>
+            <div className="text-4xl mb-2"></div>
+                        <p className="text-3xl font-semibold">Ready to Scan</p>
+            <p className="text-lg mt-1 text-blue-400">Scan barcode or type hall ticket number</p>
+
           </div>
         )}
 
