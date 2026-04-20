@@ -128,9 +128,9 @@ export default function StudentKiosk() {
           <Image
             src="/logo.png"
             alt="Varshi Innovations"
-            width={80}
-            height={80}
-            className="rounded-full object-contain w-20 h-20"
+            width={100}
+            height={100}
+            className="rounded-full object-contain w-25 h-25"
           />
                               <h1 className="font-black text-3xl leading-tight text-center mt-1">Exam Room Finder</h1>
 
@@ -158,7 +158,7 @@ export default function StudentKiosk() {
                 lookup(val)
               }
             }}
-            placeholder="Scan or Enter Hall Ticket No."
+            placeholder="Scan or Enter HT No."
             //className="flex-1 min-w-0 text-sm px-3 py-2 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
             className="flex-1 min-w-0 text-lg px-4 py-3 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest"
 
