@@ -130,7 +130,7 @@ export default function StudentKiosk() {
             alt="Varshi Innovations"
             width={100}
             height={100}
-            className="rounded-full object-contain w-25 h-25"
+            className="rounded-full object-contain w-30 h-30"
           />
                               <h1 className="font-black text-3xl leading-tight text-center mt-1">Exam Room Finder</h1>
 
