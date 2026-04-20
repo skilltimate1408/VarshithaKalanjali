@@ -136,7 +136,8 @@ export default function StudentKiosk() {
 
         </div>
         {/* Input stretches to fill remaining space */}
-                <div className="flex gap-1 w-100 absolute left-1/2 -translate-x-1/2">
+                      <div className="flex gap-1 w-96 ml-auto">
+
 
 
           <input
