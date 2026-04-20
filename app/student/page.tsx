@@ -119,7 +119,8 @@ export default function StudentKiosk() {
     <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex flex-col text-white">
 
       {/* ── TOP BAR: logo + title + input ── */}
-            <div className="flex items-center gap-4 px-4 py-2 border-b border-blue-700/40 bg-blue-900/50 shrink-0 justify-between relative">
+                  <div className="flex items-center gap-4 px-4 py-2 border-b border-blue-700/40 bg-blue-900/50 shrink-0">
+
 
         {/* Logo + title stacked on left */}
                 <div className="flex items-center gap-2 shrink-0">
@@ -136,7 +137,8 @@ export default function StudentKiosk() {
 
         </div>
         {/* Input stretches to fill remaining space */}
-                      <div className="flex gap-1 w-96 ml-auto">
+                            <div className="flex gap-1 w-80 shrink-0">
+
 
 
 
