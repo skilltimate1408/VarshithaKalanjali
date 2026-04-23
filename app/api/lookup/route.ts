@@ -32,5 +32,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Student not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ students: data })
+ // Save scan log
+await supabase.from('scan_logs').insert({
+  hall_ticket: hallTicket,
+  student_name: data[0].student_name,
+  branch: data[0].branch,
+  room_no: data[0].room_no,
+  building: data[0].building,
+  seat_no: data[0].seat_no,
+  exam_date: data[0].exam_date,
+  session: data[0].session,
+})
+
+return NextResponse.json({ students: data })
+
 }
