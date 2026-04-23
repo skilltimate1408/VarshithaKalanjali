@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
  // Save scan log
 // Get college_id from students table
-await supabase.from('scan_logs').insert({
+const { error: insertError } = await supabase.from('scan_logs').insert({
   hall_ticket: hallTicket,
   student_name: data[0].student_name,
   branch: data[0].branch,
@@ -46,6 +46,9 @@ await supabase.from('scan_logs').insert({
   session: data[0].session,
   college_id: data[0].college_id,
 })
+console.log('Insert result:', insertError)
+console.log('college_id being saved:', data[0].college_id)
+
 
 
 return NextResponse.json({ students: data })
