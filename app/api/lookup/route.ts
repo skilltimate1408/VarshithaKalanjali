@@ -15,12 +15,13 @@ export async function GET(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { data, error } = await supabase
+   const { data, error } = await supabase
     .from('students')
-    .select('student_name, branch, room_no, building, seat_no, exam_date, session')
+    .select('student_name, branch, room_no, building, seat_no, exam_date, session, college_id')
     .ilike('hall_ticket', hallTicket)
     .order('exam_date', { ascending: true })
-    .limit(1)  // always return only 1 result
+    .limit(1)
+ // always return only 1 result
 
 
   if (error) {
@@ -34,13 +35,6 @@ export async function GET(req: NextRequest) {
 
  // Save scan log
 // Get college_id from students table
-const { data: studentFull } = await supabase
-  .from('students')
-  .select('college_id')
-  .ilike('hall_ticket', hallTicket)
-  .limit(1)
-  .single()
-
 await supabase.from('scan_logs').insert({
   hall_ticket: hallTicket,
   student_name: data[0].student_name,
@@ -50,8 +44,9 @@ await supabase.from('scan_logs').insert({
   seat_no: data[0].seat_no,
   exam_date: data[0].exam_date,
   session: data[0].session,
-  college_id: studentFull?.college_id ?? null,
+  college_id: data[0].college_id,
 })
+
 
 return NextResponse.json({ students: data })
 
