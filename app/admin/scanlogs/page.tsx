@@ -27,10 +27,18 @@ export default function ScanLogs() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.push('/auth/login'); return }
 
-           const { data } = await supabase
+               const { data: college } = await supabase
+        .from('colleges')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
+
+      const { data } = await supabase
         .from('scan_logs')
         .select('*')
+        .eq('college_id', college?.id)
         .order('scanned_at', { ascending: false })
+
 
       console.log('scan logs data:', data)
 
