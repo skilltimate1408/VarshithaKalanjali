@@ -46,8 +46,10 @@ const { error: insertError } = await supabase.from('scan_logs').insert({
   session: data[0].session,
   college_id: data[0].college_id,
 })
-console.log('Insert result:', insertError)
+console.log('Full student data:', JSON.stringify(data[0]))
 console.log('college_id being saved:', data[0].college_id)
+console.log('Insert result:', insertError)
+
 
 
 
