@@ -9,8 +9,11 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false)
   const [collegeName, setCollegeName] = useState('')
   const [studentCount, setStudentCount] = useState(0)
+  const [collegeId, setCollegeId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+
 
   useEffect(() => {
     async function load() {
@@ -23,8 +26,10 @@ export default function Dashboard() {
         .eq('user_id', session.user.id)
         .single()
 
-      if (college) {
+           if (college) {
         setCollegeName(college.college_name)
+        setCollegeId(college.id)
+
         const { count } = await supabase
           .from('students')
           .select('*', { count: 'exact', head: true })
@@ -60,7 +65,27 @@ export default function Dashboard() {
     setUploading(false)
   }
 
+  async function handleDelete() {
+    if (!collegeId) return
+    const confirm = window.confirm('Are you sure? This will delete ALL student data for your college.')
+    if (!confirm) return
+    setDeleting(true)
+    setStatus('Deleting all student data...')
+    const { error } = await supabase
+      .from('students')
+      .delete()
+      .eq('college_id', collegeId)
+    if (error) {
+      setStatus(`Error: ${error.message}`)
+    } else {
+      setStudentCount(0)
+      setStatus('✓ All student data deleted. You can now upload fresh data.')
+    }
+    setDeleting(false)
+  }
+
   return (
+
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
 
