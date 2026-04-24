@@ -162,9 +162,20 @@ export default function StudentKiosk() {
             ref={inputRef}
             type="text"
             value={inputValue}
-            readOnly
-            onFocus={() => setShowKeyboard(true)}
+                        onFocus={() => setShowKeyboard(true)}
             onClick={() => setShowKeyboard(true)}
+            onChange={e => {
+              const val = e.target.value.toUpperCase()
+              setInputValue(val)
+              bufferRef.current = val
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && inputValue.trim()) {
+                if (scanTimerRef.current) clearTimeout(scanTimerRef.current)
+                lookup(inputValue.trim())
+              }
+            }}
+
             placeholder="Scan or Enter Hall Ticket No."
             className="flex-1 min-w-0 text-lg px-4 py-3 rounded-lg text-gray-900 bg-white border-2 border-yellow-400 focus:outline-none focus:border-yellow-300 font-mono tracking-widest cursor-pointer"
             autoComplete="off"
