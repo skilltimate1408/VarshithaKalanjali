@@ -53,13 +53,35 @@ export default function ScanLogs() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
 
-        <div className="flex justify-between items-center mb-6">
+             <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Scan Logs</h1>
-          <a href="/admin/dashboard"
-            className="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 text-sm">
-            ← Back to Dashboard
-          </a>
+          <div className="flex gap-3">
+            <button
+              onClick={async () => {
+                const confirm = window.confirm('Clear all scan logs for your college?')
+                if (!confirm) return
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) return
+                const { data: college } = await supabase
+                  .from('colleges')
+                  .select('id')
+                  .eq('user_id', session.user.id)
+                  .single()
+                if (!college) return
+                await supabase.from('scan_logs').delete().eq('college_id', college.id)
+                setLogs([])
+              }}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm font-semibold"
+            >
+              🗑️ Clear All Logs
+            </button>
+            <a href="/admin/dashboard"
+              className="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 text-sm">
+              ← Back to Dashboard
+            </a>
+          </div>
         </div>
+
 
         <div className="bg-white rounded-xl shadow overflow-hidden">
           {loading ? (
