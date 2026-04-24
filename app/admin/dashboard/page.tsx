@@ -3,6 +3,13 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+interface Upload {
+  id: string
+  file_name: string
+  record_count: number
+  uploaded_at: string
+}
+
 export default function Dashboard() {
   const [file, setFile] = useState<File | null>(null)
   const [status, setStatus] = useState('')
@@ -10,10 +17,25 @@ export default function Dashboard() {
   const [collegeName, setCollegeName] = useState('')
   const [studentCount, setStudentCount] = useState(0)
   const [collegeId, setCollegeId] = useState<string | null>(null)
-  const [deleting, setDeleting] = useState(false)
+  const [uploads, setUploads] = useState<Upload[]>([])
+  const [showUploadForm, setShowUploadForm] = useState(false)
   const supabase = createClient()
   const router = useRouter()
 
+  async function loadData(cid: string) {
+    const { count } = await supabase
+      .from('students')
+      .select('*', { count: 'exact', head: true })
+      .eq('college_id', cid)
+    setStudentCount(count || 0)
+
+    const { data: uploadData } = await supabase
+      .from('uploads')
+      .select('*')
+      .eq('college_id', cid)
+      .order('uploaded_at', { ascending: false })
+    setUploads(uploadData || [])
+  }
 
   useEffect(() => {
     async function load() {
@@ -26,15 +48,10 @@ export default function Dashboard() {
         .eq('user_id', session.user.id)
         .single()
 
-           if (college) {
+      if (college) {
         setCollegeName(college.college_name)
         setCollegeId(college.id)
-
-        const { count } = await supabase
-          .from('students')
-          .select('*', { count: 'exact', head: true })
-          .eq('college_id', college.id)
-        setStudentCount(count || 0)
+        await loadData(college.id)
       }
     }
     load()
@@ -58,34 +75,25 @@ export default function Dashboard() {
 
     if (result.success) {
       setStatus(`✓ ${result.count} students uploaded successfully!`)
-      setStudentCount(prev => prev + result.count)
+      setFile(null)
+      setShowUploadForm(false)
+      if (collegeId) await loadData(collegeId)
     } else {
       setStatus(`Error: ${result.error}`)
     }
     setUploading(false)
   }
 
-  async function handleDelete() {
-    if (!collegeId) return
-    const confirm = window.confirm('Are you sure? This will delete ALL student data for your college.')
+  async function handleDeleteUpload(uploadId: string) {
+    const confirm = window.confirm('Delete this upload record?')
     if (!confirm) return
-    setDeleting(true)
-    setStatus('Deleting all student data...')
-    const { error } = await supabase
-      .from('students')
-      .delete()
-      .eq('college_id', collegeId)
-    if (error) {
-      setStatus(`Error: ${error.message}`)
-    } else {
-      setStudentCount(0)
-      setStatus('✓ All student data deleted. You can now upload fresh data.')
-    }
-    setDeleting(false)
+
+    await supabase.from('uploads').delete().eq('id', uploadId)
+    if (collegeId) await loadData(collegeId)
+    setStatus('✓ Upload record deleted.')
   }
 
   return (
-
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
 
@@ -120,58 +128,118 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Excel Format Guide */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h2 className="font-semibold text-blue-800 mb-2">Excel Column Headers (Row 1 — exact names):</h2>
-          <code className="text-xs text-blue-700 block bg-blue-100 p-2 rounded">
-            hall_ticket | student_name | branch | room_no | building | seat_no | exam_date | session
-          </code>
-          <p className="text-xs text-blue-600 mt-2">
-            Date format: <strong>YYYY-MM-DD</strong> &nbsp;|&nbsp; Session: <strong>FN</strong> or <strong>AN</strong>
-          </p>
+        {/* Uploaded Sheets */}
+        <div className="bg-white rounded-xl shadow p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-semibold text-gray-700 text-lg">📂 Uploaded Sheets</h2>
+            <button
+              onClick={() => { setShowUploadForm(!showUploadForm); setStatus('') }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+            >
+              + Add New Sheet
+            </button>
+          </div>
+
+          {uploads.length === 0 ? (
+            <p className="text-gray-400 text-sm text-center py-4">No sheets uploaded yet.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 text-gray-500 font-medium">File Name</th>
+                  <th className="text-left py-2 text-gray-500 font-medium">Records</th>
+                  <th className="text-left py-2 text-gray-500 font-medium">Uploaded On</th>
+                  <th className="text-left py-2 text-gray-500 font-medium">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploads.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0">
+                    <td className="py-3 font-medium text-gray-700">📄 {u.file_name}</td>
+                    <td className="py-3 text-blue-600 font-bold">{u.record_count}</td>
+                    <td className="py-3 text-gray-500">
+                      {new Date(u.uploaded_at).toLocaleDateString('en-IN', {
+                        day: '2-digit', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                      })}
+                    </td>
+                    <td className="py-3">
+                      <button
+                        onClick={() => handleDeleteUpload(u.id)}
+                        className="text-red-500 hover:text-red-700 text-xs border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Upload Form */}
-        <form onSubmit={handleUpload} className="bg-white rounded-xl shadow p-6 space-y-4">
-          <h2 className="font-semibold text-gray-700">Upload Student Data</h2>
-          <label className="block">
-            <input
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              onChange={e => setFile(e.target.files?.[0] || null)}
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4 file:rounded-lg
-                file:border-0 file:bg-blue-600 file:text-white
-                file:cursor-pointer hover:file:bg-blue-700"
-            />
-          </label>
-          {file && (
-            <p className="text-sm text-gray-600">Selected: <strong>{file.name}</strong></p>
-          )}
-          <button
-            type="submit"
-            disabled={uploading || !file}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
-          >
-                    {uploading ? 'Processing...' : 'Upload & Parse Excel'}
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting || studentCount === 0}
-            className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50"
-          >
-            {deleting ? 'Deleting...' : '🗑️ Delete All Student Data'}
-          </button>
+        {showUploadForm && (
+          <form onSubmit={handleUpload} className="bg-white rounded-xl shadow p-6 space-y-4 mb-6">
+            <h2 className="font-semibold text-gray-700">Upload New Sheet</h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-semibold text-blue-800 mb-2 text-sm">Excel Column Headers (Row 1):</h3>
+              <code className="text-xs text-blue-700 block bg-blue-100 p-2 rounded">
+                hall_ticket | student_name | branch | room_no | building | seat_no | exam_date | session
+              </code>
+              <p className="text-xs text-blue-600 mt-2">
+                Date format: <strong>YYYY-MM-DD</strong> &nbsp;|&nbsp; Session: <strong>FN</strong> or <strong>AN</strong>
+              </p>
+            </div>
+            <label className="block">
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={e => setFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4 file:rounded-lg
+                  file:border-0 file:bg-blue-600 file:text-white
+                  file:cursor-pointer hover:file:bg-blue-700"
+              />
+            </label>
+            {file && (
+              <p className="text-sm text-gray-600">Selected: <strong>{file.name}</strong></p>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={uploading || !file}
+                className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
+              >
+                {uploading ? 'Processing...' : 'Upload & Parse Excel'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowUploadForm(false); setStatus('') }}
+                className="px-6 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+            {status && (
+              <p className={`text-center font-medium text-sm p-2 rounded ${
+                status.startsWith('✓') ? 'text-green-700 bg-green-50' : 'text-red-600 bg-red-50'
+              }`}>
+                {status}
+              </p>
+            )}
+          </form>
+        )}
 
-          {status && (
-            <p className={`text-center font-medium text-sm p-2 rounded ${
-              status.startsWith('✓') ? 'text-green-700 bg-green-50' : 'text-red-600 bg-red-50'
-            }`}>
-              {status}
-            </p>
-          )}
-        </form>
+        {/* Status outside form */}
+        {status && !showUploadForm && (
+          <p className={`text-center font-medium text-sm p-2 rounded mb-4 ${
+            status.startsWith('✓') ? 'text-green-700 bg-green-50' : 'text-red-600 bg-red-50'
+          }`}>
+            {status}
+          </p>
+        )}
+
         {/* Navigation */}
         <div className="mt-6 flex gap-3">
           <a href="/admin/students"

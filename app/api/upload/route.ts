@@ -11,19 +11,16 @@ export async function POST(req: NextRequest) {
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     if (!token) return NextResponse.json({ error: 'No auth token' }, { status: 401 })
 
-    // Use service role to bypass RLS issues
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Verify the token and get user
     const { data: { user }, error: userError } = await supabase.auth.getUser(token)
     if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized: ' + userError?.message }, { status: 401 })
     }
 
-    // Get college using the verified user id
     const { data: college, error: collegeError } = await supabase
       .from('colleges')
       .select('id')
@@ -31,12 +28,11 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (collegeError || !college) {
-      return NextResponse.json({ 
-        error: `College not found for user ${user.id}. Error: ${collegeError?.message}` 
+      return NextResponse.json({
+        error: `College not found for user ${user.id}. Error: ${collegeError?.message}`
       }, { status: 404 })
     }
 
-    // Parse Excel
     const buffer = await file.arrayBuffer()
     const workbook = XLSX.read(buffer, { type: 'array', cellDates: true })
     const sheet = workbook.Sheets[workbook.SheetNames[0]]
@@ -89,6 +85,13 @@ export async function POST(req: NextRequest) {
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 })
     }
+
+    // Save upload record
+    await supabase.from('uploads').insert({
+      college_id: college.id,
+      file_name: file.name,
+      record_count: students.length,
+    })
 
     return NextResponse.json({ success: true, count: students.length })
 
