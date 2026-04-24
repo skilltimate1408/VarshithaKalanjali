@@ -56,9 +56,33 @@ export default function ScanLogs() {
              <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Scan Logs</h1>
           <div className="flex gap-3">
+                       <button
+              onClick={async () => {
+                setLoading(true)
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) return
+                const { data: college } = await supabase
+                  .from('colleges')
+                  .select('id')
+                  .eq('user_id', session.user.id)
+                  .single()
+                if (!college) return
+                const { data } = await supabase
+                  .from('scan_logs')
+                  .select('*')
+                  .eq('college_id', college.id)
+                  .order('scanned_at', { ascending: false })
+                setLogs(data || [])
+                setLoading(false)
+              }}
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 text-sm font-semibold"
+            >
+              🔄 Refresh
+            </button>
             <button
               onClick={async () => {
                 const confirm = window.confirm('Clear all scan logs for your college?')
+
                 if (!confirm) return
                 const { data: { session } } = await supabase.auth.getSession()
                 if (!session) return
