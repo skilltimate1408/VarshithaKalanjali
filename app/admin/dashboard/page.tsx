@@ -153,8 +153,17 @@ export default function Dashboard() {
             disabled={uploading || !file}
             className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
           >
-            {uploading ? 'Processing...' : 'Upload & Parse Excel'}
+                    {uploading ? 'Processing...' : 'Upload & Parse Excel'}
           </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting || studentCount === 0}
+            className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50"
+          >
+            {deleting ? 'Deleting...' : '🗑️ Delete All Student Data'}
+          </button>
+
           {status && (
             <p className={`text-center font-medium text-sm p-2 rounded ${
               status.startsWith('✓') ? 'text-green-700 bg-green-50' : 'text-red-600 bg-red-50'
